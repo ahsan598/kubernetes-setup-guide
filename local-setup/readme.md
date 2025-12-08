@@ -1,15 +1,11 @@
-# 🚀 Kubernetes Local Setup using Kind (Kubernetes in Docker)
+# 🚀 Kubernetes Local Setup with KIND (Kubernetes in Docker)
 
-Kind = Kubernetes in Docker → Best for DevOps practice, CI testing & learning
+KIND = Run Kubernetes inside Docker containers → Ideal for local DevOps practice, CI, and learning.
 
 
 ### ⚙️ Prerequisites
-| Requirement      | Status                  |
-| ---------------- | ----------------------- |
-| Docker Installed | Required                |
-| RAM              | 4GB+ recommended        |
-| OS Supported     | Windows / Linux / macOS |
-
+- Docker (required)
+- Kubectl CLI (required)
 
 
 ### 🔧 Installtion Steps
@@ -34,20 +30,62 @@ sudo mv kind /usr/local/bin/kind
 kind version
 ```
 
-**3. Create Kubernetes Cluster**
+### 🚀 Create a Kubernetes Cluster
+**1. Default single-node cluster**
 ```sh
 kind create cluster --name dev-cluster
 
-#Test Cluster
+# Verify
 kubectl cluster-info
 kubectl get nodes
 ```
 
-**4. Set Context for Namespace**
+**2. Set default Namespace (Optional)**
 ```sh
 kubectl config set-context kind-dev-cluster --namespace=dev
 
 kubectl config get-contexts
+```
+
+### 🧩 Multi Node Cluster
+KIND config file `kind-config.yml`
+```yml
+# three node (two workers) cluster config
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+- role: worker
+- role: worker
+```
+
+Create cluster with config
+```sh
+kind create cluster --name dev-cluster --config kind-config.yaml
+```
+
+
+### 🔧 Kind Cluster Management
+
+**1. Pause cluster (free Memory)**
+```sh
+docker stop kind-control-plane
+```
+
+**2. Stop multiple node cluster**
+```sh
+docker ps | grep kind
+docker stop <all-kind-node-containers>
+```
+
+**3. Resume cluster**
+```sh
+docker start <container_name>
+```
+
+**4.  Completely delete cluster (fresh reset)**
+```sh
+kind delete cluster --name dev-cluster
 ```
 
 
@@ -85,38 +123,9 @@ kubectl set image deployment/nginx nginx=nginx:1.25 --record -n dev
 kubectl rollout undo deployment/nginx -n dev
 ```
 
-### 🔧 Kind Cluster Management
+---
 
-**1. Pause cluster (Memory free → restart later possible)**
-```sh
-# Export config before stopping (optional)
-kind export kubeconfig --name dev-cluster
-
-docker stop kind-control-plane
-```
-
-**2. Stop multiple node cluster**
-```sh
-docker ps | grep kind
-docker stop <all-kind-node-containers>
-```
-
-**3. Resume cluster**
-```sh
-docker start <container_name>
-```
-
-**4.  Completely delete cluster (fresh reset)**
-```sh
-kind delete cluster --name dev-cluster
-```
-
-
-### 🧭 Quick Decision Guide
-
-| Task                 | What to do                                       |
-| -------------------- | ------------------------------------------------ |
-| Remove app only      | `kubectl delete deployment` / scale `replicas=0` |
-| Free RAM temporarily | `docker stop kind-*`                             |
-| Fresh start cluster  | `kind delete cluster`                            |
-
+### Reference
+- [Kind Docs](https://kind.sigs.k8s.io/docs/user/quick-start/)
+- [Kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [Docker Install](https://docs.docker.com/engine/install/)
