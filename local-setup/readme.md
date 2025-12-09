@@ -4,13 +4,15 @@ KIND = Run Kubernetes inside Docker containers → Ideal for local DevOps practi
 
 
 ### ⚙️ Prerequisites
-- Docker (required)
-- Kubectl CLI (required)
+| **Tools**        | **Status**   |
+| ---------------- | ------------ |
+| Docker           | Required     |
+| Kubectl          | Required     |
 
 
 ### 🔧 Installtion Steps
 
-**1. Install Kubectl**
+**1. Install Kubectl CLI**
 ```sh
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 
@@ -33,22 +35,29 @@ kind version
 ### 🚀 Create a Kubernetes Cluster
 **1. Default single-node cluster**
 ```sh
-kind create cluster --name dev-cluster
+kind create cluster --name <cluster-name>           # name: dev-cluster
 
 # Verify
 kubectl cluster-info
+
+kubectl cluster-info --context kind-dev-cluster
 kubectl get nodes
 ```
 
-**2. Set default Namespace (Optional)**
+**2. Set default context (use cluster name you want to switch)**
 ```sh
-kubectl config set-context kind-dev-cluster --namespace=dev
-
 kubectl config get-contexts
+
+kubectl config set-context kind-dev-cluster             # --namespace=dev
+```
+
+**3.  Completely delete cluster (fresh reset)**
+```sh
+kind delete cluster --name <cluster-name>
 ```
 
 ### 🧩 Multi Node Cluster
-KIND config file `kind-config.yml`
+**1. KIND config file `kind-config.yml`**
 ```yml
 # three node (two workers) cluster config
 kind: Cluster
@@ -59,33 +68,23 @@ nodes:
 - role: worker
 ```
 
-Create cluster with config
+**2. Create cluster with config**
 ```sh
-kind create cluster --name dev-cluster --config kind-config.yaml
+kind create cluster --name <cluster-name> --config kind-config.yaml
+
+Ex: kind create cluster --name dev-cluster2 --config kind-config.yaml
 ```
 
-
-### 🔧 Kind Cluster Management
-
-**1. Pause cluster (free Memory)**
+**3. Set context to dev-cluster2**
 ```sh
-docker stop kind-control-plane
-```
+kubectl config get-contexts
 
-**2. Stop multiple node cluster**
-```sh
-docker ps | grep kind
-docker stop <all-kind-node-containers>
-```
-
-**3. Resume cluster**
-```sh
-docker start <container_name>
+kubectl config set-context kind-dev-cluster2
 ```
 
 **4.  Completely delete cluster (fresh reset)**
 ```sh
-kind delete cluster --name dev-cluster
+kind delete cluster --name <cluster-name>
 ```
 
 
