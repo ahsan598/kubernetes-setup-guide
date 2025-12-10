@@ -47,42 +47,14 @@ kubectl get nodes
 **2. Set default context (use cluster name you want to switch)**
 ```sh
 kubectl config get-contexts
+kubectl config set-context <context-name>
+kubectl config use-context <context-name>
+kubectl config delete-context <context-name>
 
-kubectl config set-context kind-dev-cluster             # --namespace=dev
+Ex: kubectl config set-context kind-dev-cluster --namespace=dev
 ```
 
 **3.  Completely delete cluster (fresh reset)**
-```sh
-kind delete cluster --name <cluster-name>
-```
-
-### 🧩 Multi Node Cluster
-**1. KIND config file `kind-config.yml`**
-```yml
-# three node (two workers) cluster config
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-nodes:
-- role: control-plane
-- role: worker
-- role: worker
-```
-
-**2. Create cluster with config**
-```sh
-kind create cluster --name <cluster-name> --config kind-config.yaml
-
-Ex: kind create cluster --name dev-cluster2 --config kind-config.yaml
-```
-
-**3. Set context to dev-cluster2**
-```sh
-kubectl config get-contexts
-
-kubectl config set-context kind-dev-cluster2
-```
-
-**4.  Completely delete cluster (fresh reset)**
 ```sh
 kind delete cluster --name <cluster-name>
 ```
